@@ -1,0 +1,16 @@
+app = "bench-backend"
+
+[build]
+  dockerfile = "apps/backend/Dockerfile"
+
+[env]
+  JWT_SECRET = "changeme"          # ここは Fly の Secrets に上書き
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+  [[services.ports]]
+    port = 443
