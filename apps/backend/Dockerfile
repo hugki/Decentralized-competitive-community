@@ -1,13 +1,16 @@
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
 
 WORKDIR /app
 ENV PYTHONUNBUFFERED=1
 
-# deps
-COPY apps/backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy dependency definition files first for better caching
+COPY pyproject.toml uv.lock ./
 
-# src
+# Install only runtime dependencies (skip dev extras)
+RUN uv sync --system --no-dev
+
+# Copy backend source code
 COPY apps/backend /app/apps/backend
 
-CMD ["uvicorn", "apps.backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Start the FastAPI server via uv
+CMD ["uv", "run", "uvicorn", "apps.backend.main:app", "--host", "0.0.0.0", "--port", "8080"]

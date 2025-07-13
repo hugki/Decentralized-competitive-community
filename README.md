@@ -119,10 +119,10 @@ make run-backend     # start backend server (http://localhost:8000)
 make run-frontend    # start frontend (http://localhost:3000/leaderboard)
 
 # Traditional setup (slower)
-pip install -r requirements.txt
+uv sync
 source env/dev.sh
-alembic upgrade head
-uvicorn apps.backend.main:app --reload
+uv run alembic upgrade head
+uv run uvicorn apps.backend.main:app --reload
 
 # Build runtime image
 docker build -t bench/runtime:0.1 apps/bench-cli/runtime
@@ -231,91 +231,6 @@ The system runs end-to-end in prod-like conditions with hourly leaderboard, quot
 READMEのロードマップセクションを、5ショット評価の拡張性について明確にする形で修正します：
 
 ```markdown
-
----
-
-## 11. Long-term Roadmap: Towards Community-Driven Model Development
-
-Our MVP intentionally starts minimal, but the vision extends far beyond simple benchmarking. We're building the foundation for a community where model evaluation and development are deeply intertwined.
-
-### Phase 1: Foundation (Current MVP) ✅
-- Basic leaderboard with TruthfulQA & GSM8K micro-benchmarks
-- **5-shot evaluation as extensible baseline** (not a limitation, but a starting point)
-- Tamper-proof consensus mechanism
-- Contributor quota system
-- Zero-storage architecture
-
-### Phase 2: Scalable Evaluation Framework (Q2 2025)
-- **Dynamic shot configuration**: 5 → 25 → 100+ shots based on task complexity
-- **Adaptive evaluation depth**: More shots for close competitions, fewer for clear winners
-- **Community-defined evaluation budgets**: Collectively decide compute allocation
-- **Progressive evaluation**: Start with 5-shot, expand if model shows promise
-- **Evaluation effort remains constant**: Whether quota is 3 or 10, total community workload stays balanced
-
-#### Key Design Principle: Evaluation Elasticity
-```yaml
-evaluation_depth:
-  quick_filter: 5 shots      # MVP: rapid iteration
-  standard: 25 shots         # Default for established models
-  comprehensive: 100+ shots  # For top-tier models
-  custom: community_defined  # Task-specific requirements
-
-# Total community compute remains constant:
-# 1000 models × 5 shots = 200 models × 25 shots = 50 models × 100 shots
-```
-
-### Phase 3: Evaluation Diversity & Model Repository Integration (Q3 2025)
-- **Human-in-the-loop evaluation**: Subjective quality assessments
-- **Multi-modal benchmarks**: Image, audio, video comprehension
-- **Domain-specific tracks**: Medical, Legal, Code, Scientific reasoning
-- **Commit-level tracking**: Link submissions to specific model commits
-- **Training metadata**: Attach configs, datasets, compute requirements
-- **Lineage graphs**: Visualize model family trees and LoRA inheritance
-
-### Phase 4: Community Governance (Q4 2025)
-- **Evaluation DAO**: Token-based voting on benchmark selection and shot counts
-- **Contributor tiers**: 
-  - **Evaluators**: Run benchmarks, earn credits
-  - **Benchmark Authors**: Design tasks and define appropriate shot counts
-  - **Core Contributors**: Define evaluation methodology and resource allocation
-- **Dynamic quota system**: Adjust based on current queue and evaluation depth
-- **Compute pooling**: Share resources for deeper evaluations of promising models
-
-### Phase 5: Evaluation-Driven Development (2026)
-- **Auto-improvement loops**: Models fine-tune based on comprehensive evaluation
-- **Tiered evaluation pipeline**: 
-  ```
-  New model → 5-shot screen → 25-shot validation → 100-shot certification
-  ```
-- **Community consensus on depth**: Vote on how deeply to evaluate each model class
-- **Best practices codification**: Optimal shot counts for different model types
-- **Impact-weighted evaluation**: More shots for models with higher real-world usage
-
-### Technical Evolution for Scalable Evaluation
-```
-2025 Q1: Fixed 5-shot (MVP baseline)
-2025 Q2: Configurable shots (5-100) + batched evaluation
-2025 Q3: Adaptive depth based on score variance
-2025 Q4: Community-voted evaluation budgets
-2026:    ML-optimized shot selection
-```
-
-### Evaluation Philosophy
-The 5-shot baseline is not a compromise but a **design choice for rapid iteration**. The architecture supports:
-- **Constant community workload**: More models × fewer shots = Fewer models × more shots
-- **Quality over quantity**: Better to deeply evaluate important models than superficially evaluate all
-- **Progressive refinement**: Start fast, go deep when it matters
-- **Community-driven depth**: Let contributors decide where to invest evaluation effort
-
-### Getting Involved
-- **Today**: Run 5-shot evaluations, help establish baselines
-- **Soon**: Propose optimal shot counts for new benchmarks
-- **Future**: Vote on community evaluation budget allocation
-
----
-
-*"The best evaluation depth is not fixed—it emerges from community consensus and available resources."*
-```
 
 ---
 
@@ -479,7 +394,7 @@ docker run -d --name redis -p 6379:6379 redis:7
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -r apps/backend/requirements.txt
+uv sync
 ```
 
 #### 3-A. 環境変数
@@ -548,7 +463,7 @@ docker build -t bench/runtime:0.1 apps/bench-cli/runtime
 ### 5. CLI を使用
 
 ```bash
-pip install -e apps/bench-cli        # Typer CLI を editable-install
+uv pip install --system -e apps/bench-cli        # Typer CLI を editable-install
 
 # 「GitHub OIDC トークン」を省略する代わりに文字列 dummy を送る
 bench login --token dummy
